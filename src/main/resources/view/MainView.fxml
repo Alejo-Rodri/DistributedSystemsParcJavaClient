@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="alejandro.controller.MainController">
+    <top>
+        <VBox spacing="10">
+            <Label text="SGD" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+            <HBox spacing="10">
+                <Label fx:id="usernameLabel" text="Usuario: " />
+                <Label fx:id="folderLabel" text="root" />
+                <Button text="CreateUser" onAction="#onCreateUser" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Search..." />
+                <Button text="Search" onAction="#onSearch" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane>
+            <TreeView fx:id="folderTreeView" prefWidth="200" />
+            <TableView fx:id="contentTableView">
+                <columns>
+                    <!-- TODO cambiar el id de esto abajo -->
+                    <TableColumn fx:id="nameColumn"/>
+                    <!-- Puedes agregar más columnas si es necesario -->
+                </columns>
+            </TableView>
+        </SplitPane>
+    </center>
+</BorderPane>
+

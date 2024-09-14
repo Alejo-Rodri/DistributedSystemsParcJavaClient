@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option go_package = "infrastructure/grpcserver/services/auth";
+option java_package = "com.grpc.demo.services";
+
+package auth;
+
+service AuthService {
+    rpc Ping (PingRequest) returns (PingReply);
+    rpc AddUserToGroup (AddUserToGroupRequest) returns (AddUserToGroupResponse);
+    rpc CreateUser (RegisterRequest) returns (RegisterResponse);
+    rpc Login (LoginRequest) returns (LoginResponse);
+}
+
+message PingRequest {}
+
+message PingReply {
+  string message = 1;
+}
+
+// --------------------- Register
+message RegisterRequest {
+    string uid = 1;
+    string name = 2;
+    string lastname = 3; 
+    string email = 4;
+    string password = 5;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// --------------------- Login
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    bool success = 1;
+    string token = 2; 
+}
+
+// --------------------- Add User to group 
+message AddUserToGroupRequest {
+    string username = 1;
+    string groupname = 2;
+}
+
+message AddUserToGroupResponse {
+    bool success = 1;
+    string message = 2;
+}
