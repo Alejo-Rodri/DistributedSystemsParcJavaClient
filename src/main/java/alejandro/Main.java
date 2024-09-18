@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            FXMLLoader loginLoader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/LoginScene.fxml")));
+            FXMLLoader loginLoader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/ArchivosView.fxml")));
             Parent root = loginLoader.load();
 
             primaryStage.setTitle("Sistema de Gestión Documental");
