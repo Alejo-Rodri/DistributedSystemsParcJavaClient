@@ -13,13 +13,13 @@
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
 
-    <Label text="Nombrar carpeta en :"/>
+    <Label text="Nombre de la nueva carpeta :"/>
     <TextField fx:id="folderNameField" promptText="Nombre de la carpeta"/>
 
     <!-- Contenedor HBox para los botones -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Cancelar"/>
-        <Button text="Crear"/>
+        <Button text="Cancelar" onAction="#onCancel"/>
+        <Button text="Crear" onAction="#onCreateFolder"/>
     </HBox>
     
 </VBox>

@@ -1,9 +1,5 @@
 package alejandro.controller;
 
-import alejandro.controller.repository.GoSocket;
-import alejandro.controller.repository.GrpcClient;
-import alejandro.model.Services;
-import alejandro.model.domain.User;
 import alejandro.utils.Environment;
 import alejandro.utils.Logs;
 import javafx.fxml.FXML;
@@ -25,7 +21,7 @@ public class LoginController {
 
     @FXML
     private PasswordField passwordField;
-
+/*
     private Services services;
     //private GrpcClient grpcClient;
 
@@ -60,6 +56,7 @@ public class LoginController {
             alert.showAndWait();
         }
     }
+*/
 
     private void loadNextScene() {
         try {
@@ -67,7 +64,7 @@ public class LoginController {
             Parent mainRoot = mainLoader.load();
 
             MainController mainController = mainLoader.getController();
-            mainController.setServices(services);
+            //mainController.setServices(services);
 
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(mainRoot, 800, 600));
