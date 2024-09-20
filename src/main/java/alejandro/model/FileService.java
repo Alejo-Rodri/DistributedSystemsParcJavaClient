@@ -1,8 +1,10 @@
 package alejandro.model;
 
 import alejandro.controller.repository.GrpcClient;
+import alejandro.model.domain.File;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileService {
     private final GrpcClient grpcClient;
@@ -85,7 +87,8 @@ public class FileService {
         arrayList.add("c");
         return arrayList;
     }
-    /*
+
+    /* 
     public List<File> listFiles(String folderPath) {
         try {
             return grpcClient.listFiles(jwt, folderPath);
@@ -94,8 +97,8 @@ public class FileService {
             return new ArrayList<>();
         }
 
-    }*/
-
+    }
+*/
     public void createUser(String uid, String cn, String surname, String mail, String psswd) {
         grpcClient.register(uid, cn, surname, mail, psswd);
     }

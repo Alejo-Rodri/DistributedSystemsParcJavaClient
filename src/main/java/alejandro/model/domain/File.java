@@ -18,6 +18,11 @@ public class File {
         owner = "";
     }
 
+    public File()
+    {
+        
+    }
+
     public File(String fileName, String filePath, float size, String dateCreated, String owner) {
         this.fileName = fileName;
         this.filePath = filePath;

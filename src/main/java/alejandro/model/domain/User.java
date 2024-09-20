@@ -14,6 +14,7 @@ public class User {
         this.password = password;
         this.jwt = jwt;
     }
+    
 
     public String getId() {
         return id;

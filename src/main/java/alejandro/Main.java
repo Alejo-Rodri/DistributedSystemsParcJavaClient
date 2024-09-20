@@ -14,8 +14,13 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
+            /*
             FXMLLoader loginLoader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/LoginScene.fxml")));
             Parent root = loginLoader.load();
+            */
+            
+            FXMLLoader mainView = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/MainView.fxml")));
+            Parent root = mainView.load();
 
             primaryStage.setTitle("Sistema de Gestión Documental");
             primaryStage.setScene(new Scene(root, 800, 600));
