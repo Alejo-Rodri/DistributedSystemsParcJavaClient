@@ -120,6 +120,8 @@ public class MainController {
         loadFilesAndFolders(folderPath);
     }
     
+    
+    
 
 
 
@@ -159,6 +161,83 @@ public class MainController {
             e.printStackTrace();
         }
     }
+  
+    private void openRenameFolderModal(String path) {
+        try {
+            // Cargar el modal desde el archivo FXML
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/ModalRenameFolder.fxml")));
+            
+
+            Parent parent = loader.load();
+
+            // Crear una nueva ventana (Stage) para el modal
+            Stage stage = new Stage();
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Renombrar carpeta");
+
+
+            stage.setMinWidth(400); // Ancho mínimo en píxeles
+            stage.setMinHeight(200);
+            stage.setScene(new Scene(parent));
+
+            // Obtener el controlador del modal
+            RenameFolderModalController controller = loader.getController();
+
+            // Mostrar el modal y esperar hasta que el usuario lo cierre
+            stage.showAndWait();
+            
+            // Procesar el nombre de la carpeta cuando el usuario confirme
+            if (controller.isConfirmed()) {
+                String folderName = controller.getFolderName();
+                renameFolder(path, folderName);
+                loadFilesAndFolders(folderPath);
+                
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void openRenameFileModal(String path) {
+        try {
+            // Cargar el modal desde el archivo FXML
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/ModalRenameFile.fxml")));
+            
+
+            Parent parent = loader.load();
+
+            // Crear una nueva ventana (Stage) para el modal
+            Stage stage = new Stage();
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Renombrar archivo");
+
+
+            stage.setMinWidth(400); // Ancho mínimo en píxeles
+            stage.setMinHeight(200);
+            stage.setScene(new Scene(parent));
+
+            // Obtener el controlador del modal
+            RenameFileModalController controller = loader.getController();
+
+            // Mostrar el modal y esperar hasta que el usuario lo cierre
+            stage.showAndWait();
+            
+            // Procesar el nombre de la carpeta cuando el usuario confirme
+            if (controller.isConfirmed()) {
+                String folderName = controller.getFolderName();
+                renameFile(path, folderName);
+                loadFilesAndFolders(folderPath);
+                
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
 
 
 
@@ -196,21 +275,21 @@ public class MainController {
             // Definir el tamaño uniforme de los botones
             double buttonWidth = 150;
             double buttonHeight = 100;
-    
+
             // Obtener el directorio de archivos
             java.io.File folder = new java.io.File(path);
             java.io.File[] files = folder.listFiles(); // Listar todos los archivos y carpetas
-    
+
             if (files != null) {
                 int column = 0;
                 int row = 0;
-    
+
                 // Iterar sobre todos los archivos y carpetas
                 for (java.io.File file : files) {
-    
+
                     // Crear un botón para cada archivo o carpeta
                     Button fileButton = new Button(file.getName());
-    
+
                     // Establecer el ícono dependiendo si es un archivo o carpeta
                     ImageView icon;
                     if (file.isDirectory()) {
@@ -218,33 +297,71 @@ public class MainController {
                     } else {
                         icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/addfile.png")));
                     }
-    
+
                     // Configurar el tamaño del ícono
                     icon.setFitWidth(32);
                     icon.setFitHeight(32);
                     fileButton.setGraphic(icon);
-    
+
                     // Establecer el mismo tamaño para todos los botones
                     fileButton.setPrefWidth(buttonWidth);   // Ancho del botón
                     fileButton.setPrefHeight(buttonHeight); // Alto del botón
-    
-                    // Abrir una carpeta
-                    if (file.isDirectory()) {
-                    fileButton.setOnAction(event -> {
-                        pilaRutas.push(folderPath);
-                        folderPath=file.getAbsolutePath();
-                        lblRuta.setText(folderPath);
-                        volverButton.setVisible(true);
-                        System.out.println(file.getAbsolutePath());
-                        loadFilesAndFolders(file.getAbsolutePath());
-                        
-                        // Aquí puedes agregar más lógica para abrir el archivo o mostrar su contenido
-                    });}
+
+                    // Crear el ContextMenu
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    // Añadir elementos al menú contextual
                     
-    
+                    MenuItem renombrarItem = new MenuItem("Renombrar");
+                    MenuItem eliminarItem = new MenuItem("Eliminar");
+
+                    
+
+                    renombrarItem.setOnAction(event -> {
+                        if (file.isDirectory()) {
+                            openRenameFolderModal(file.getAbsolutePath());
+                        }else{
+                            openRenameFileModal(file.getAbsolutePath());
+                        }
+                        // Lógica para renombrar el archivo o carpeta
+                    });
+
+                    eliminarItem.setOnAction(event -> {
+                        if (file.isDirectory()) {
+                        System.out.println("Eliminada la carpeta " + file.getName());
+                            deleteFolder(file.getAbsolutePath());
+                            loadFilesAndFolders(folderPath);
+                        
+                        }else {
+                            System.out.println("Eliminado el archivo " + file.getName());
+                            deleteFile(file.getAbsolutePath());
+                            loadFilesAndFolders(folderPath);
+                        }
+                    });
+
+                    // Añadir los items al ContextMenu
+                    contextMenu.getItems().addAll( renombrarItem, eliminarItem);
+
+                    // Asociar el menú contextual al botón
+                    fileButton.setOnContextMenuRequested(event -> {
+                        
+                        contextMenu.show(fileButton, event.getScreenX(), event.getScreenY());
+                    });
+
+                    // Evento para abrir una carpeta con el botón izquierdo
+                    if (file.isDirectory()) {
+                        fileButton.setOnAction(event -> {
+                            pilaRutas.push(folderPath);
+                            folderPath = file.getAbsolutePath();
+                            lblRuta.setText(folderPath);
+                            volverButton.setVisible(true);
+                            loadFilesAndFolders(folderPath);
+                        });
+                    }
+
                     // Añadir el botón al GridPane
                     gridPane.add(fileButton, column, row);
-    
+
                     // Controlar las columnas y filas
                     column++;
                     if (column == 6) { // Máximo 6 columnas por fila
@@ -258,6 +375,7 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
 
 
 
@@ -341,29 +459,32 @@ public class MainController {
         Path destinationPath = Paths.get(path);
 
         // Verificar si el archivo de origen existe
-        if (!file.exists()) {
-            System.out.println("El archivo no existe: " + file.getAbsolutePath());
-            return;
-        }
+        if(file!=null){
+            if (!file.exists()) {
+                System.out.println("El archivo no existe: " + file.getAbsolutePath());
+                return;
+            }
+        
 
-        // Verificar si la ruta de destino es un directorio y existe
-        if (!Files.isDirectory(destinationPath)) {
-            System.out.println("La ruta de destino no es un directorio o no existe: " + path);
-            return;
-        }
+            // Verificar si la ruta de destino es un directorio y existe
+            if (!Files.isDirectory(destinationPath)) {
+                System.out.println("La ruta de destino no es un directorio o no existe: " + path);
+                return;
+            }
 
-        // Intentar copiar el archivo al destino
-        try {
-            Path sourcePath = file.toPath(); // Convertir File a Path
-            Path targetPath = destinationPath.resolve(file.getName()); // Añadir el nombre del archivo al destino
+            // Intentar copiar el archivo al destino
+            try {
+                Path sourcePath = file.toPath(); // Convertir File a Path
+                Path targetPath = destinationPath.resolve(file.getName()); // Añadir el nombre del archivo al destino
 
-            // Copiar el archivo a la ruta de destino
-            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                // Copiar el archivo a la ruta de destino
+                Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-            System.out.println("Archivo subido correctamente a: " + targetPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error al subir el archivo.");
+                System.out.println("Archivo subido correctamente a: " + targetPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error al subir el archivo.");
+            }
         }
     }
     
@@ -556,5 +677,43 @@ public class MainController {
         }
     }
     
+    public void renameFile(String path, String nombreNuevo) {
+        Path sourcePath = Paths.get(path);
+        Path targetPath = sourcePath.resolveSibling(nombreNuevo);
 
+        try {
+            // Verificar si el archivo original existe
+            if (Files.exists(sourcePath)) {
+                // Renombrar el archivo
+                Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Archivo renombrado exitosamente a: " + targetPath.toString());
+            } else {
+                System.out.println("El archivo no existe: " + path);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error al renombrar el archivo.");
+        }
+    }
+    
+    public void renameFolder(String path, String nombreNuevo) {
+        Path sourcePath = Paths.get(path);
+        Path targetPath = sourcePath.resolveSibling(nombreNuevo);
+
+        try {
+            // Verificar si la carpeta de origen existe
+            if (Files.exists(sourcePath) && Files.isDirectory(sourcePath)) {
+                // Renombrar la carpeta
+                Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Carpeta renombrada exitosamente a: " + targetPath.toString());
+            } else {
+                System.out.println("La carpeta no existe: " + path);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error al renombrar la carpeta.");
+        }
+    }
+    
+    
 }
