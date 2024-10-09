@@ -40,6 +40,7 @@ import javax.swing.JFileChooser;
 
 import alejandro.model.FileU;
 import alejandro.services.FileServiceF.FileService;
+import com.grpc.Sincronizacion;
 
 public class MainController {
 
@@ -79,6 +80,8 @@ public class MainController {
     private Label userLabel;
     @FXML
     private Button openSharedButton;
+    @FXML
+    private Button syncButton;
 
   
     private Stack<String> pilaRutas = new Stack<>();
@@ -119,6 +122,9 @@ public class MainController {
         addFileButton.setOnAction(event -> openFileChooser());
         addFolderButton.setOnAction(event -> openCreateFolderModal());
         openSharedButton.setOnAction(event -> openSharedFolder());
+        
+        //evento boton sincronizar
+        syncButton.setOnAction(event -> syncFiles());
     }
      
    
@@ -139,7 +145,21 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }      
+    }     
+    
+   //metodo para sincronizar
+    private void syncFiles()
+    {
+        Sincronizacion sync =new Sincronizacion();
+        sync.sincronizar();
+        
+        
+        // esto es pa recargar la pagina apenas sincronice lo comente pq se queda pegado antes de que carge la vista, pero creo que es normal XD
+        
+        folderPath = "D://LocalFiles"; 
+        loadFilesAndFolders(folderPath);
+        
+    }   
 
     
 

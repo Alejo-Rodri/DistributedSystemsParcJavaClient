@@ -38,12 +38,18 @@
                 <ImageView fitHeight="16" fitWidth="16" />
               </graphic>
             </Button>
+            
+            <Button fx:id="syncButton">
+              <graphic>
+                <ImageView fitHeight="16" fitWidth="16" />
+              </graphic>
+            </Button>
             </HBox>
             
              
          <HBox spacing="10">
                 
-                <Label fx:id="lblRuta" text="D://Archivos" style="-fx-text-fill: white;">
+                <Label fx:id="lblRuta" text="D://LocalFiles" style="-fx-text-fill: white;">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font></Label>
