@@ -27,6 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Stack;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -36,6 +37,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javax.swing.JFileChooser;
+
+import alejandro.model.FileU;
+import alejandro.services.FileServiceF.FileService;
 
 public class MainController {
 
@@ -71,39 +75,73 @@ public class MainController {
     @FXML
     private Button volverButton;
     
+    @FXML
+    private Label userLabel;
+    @FXML
+    private Button openSharedButton;
 
   
     private Stack<String> pilaRutas = new Stack<>();
-    private String folderPath; // Cambia a la carpeta que desees explorar
-
+    private String folderPath = "D://LocalFiles"; 
+    private FileService fileService = new FileService();
+    private FileU file  = new FileU();
     
 
-    public void initialize() {
+    public void initialize() throws IOException {
+        
+        
         folderPath= getLocalFolder();
         lblRuta.setText(folderPath);
         loadFilesAndFolders(folderPath);
         volverButton.setVisible(false);
-        
-        
         initializeGridPane();
         Image image = new Image(getClass().getResourceAsStream("/icons/addfile.png"));
         ImageView imageView = new ImageView(image);
 
+        Image imageshared = new Image(getClass().getResourceAsStream("/icons/sharedicon.png"));
+        ImageView sharedicon = new ImageView(imageshared);
+
         Image imageFolder = new Image(getClass().getResourceAsStream("/icons/addFolder.png"));
         ImageView imageViewF = new ImageView(imageFolder);
-        imageView.setFitWidth(18);
-        imageView.setFitHeight(18);
 
-        imageViewF.setFitWidth(18); 
-        imageViewF.setFitHeight(18);
+        imageView.setFitWidth(24);
+        imageView.setFitHeight(24);
+
+        imageViewF.setFitWidth(24); 
+        imageViewF.setFitHeight(24);
+
+        sharedicon.setFitWidth(24); 
+        sharedicon.setFitHeight(24);
         
         addFileButton.setGraphic(imageView);
+        openSharedButton.setGraphic(sharedicon);
         addFolderButton.setGraphic(imageViewF);
         addFileButton.setOnAction(event -> openFileChooser());
         addFolderButton.setOnAction(event -> openCreateFolderModal());
+        openSharedButton.setOnAction(event -> openSharedFolder());
     }
      
+   
+    private void openSharedFolder()
+    {
+        try {
 
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/SharedFolder.fxml"));
+            Parent root = fxmlLoader.load();
+    
+           
+            Stage stage = new Stage();
+            stage.setTitle("Compartidos");
+            stage.setMinWidth(500);
+            stage.setMinHeight(300);
+            stage.setScene(new Scene(root)); 
+            stage.show();     
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }      
+
+    
 
     private void openFileChooser() {
         FileChooser fileChooser = new FileChooser();
@@ -120,10 +158,6 @@ public class MainController {
         loadFilesAndFolders(folderPath);
     }
     
-    
-    
-
-
 
   private void openCreateFolderModal() {
         try {
@@ -239,32 +273,29 @@ public class MainController {
     }
     
 
-
-
-
-
     private void initializeGridPane() {
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
         
-        int numCols = 6; // Número de columnas
-        int numRows = 5; // Número de filas (ajusta según lo que necesites)
+        int numCols = 6;
+        int numRows = 5; 
     
         for (int col = 0; col < numCols; col++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
-            columnConstraints.setPrefWidth(160); // Tamaño uniforme de columnas
+            columnConstraints.setPrefWidth(130); 
+            //columnConstraints.setPrefHeight(70);
             columnConstraints.setHalignment(HPos.CENTER);
             gridPane.getColumnConstraints().add(columnConstraints);
         }
     
         for (int row = 0; row < numRows; row++) {
             RowConstraints rowConstraints = new RowConstraints();
-            rowConstraints.setPrefHeight(120); // Tamaño uniforme de filas
+            rowConstraints.setPrefHeight(70);
             gridPane.getRowConstraints().add(rowConstraints);
         }
     
-        gridPane.setHgap(20); // Espaciado horizontal entre botones
-        gridPane.setVgap(20); // Espaciado vertical entre botones
+        gridPane.setHgap(20);
+        gridPane.setVgap(20); 
     }
     
 
@@ -272,58 +303,58 @@ public class MainController {
     private void loadFilesAndFolders(String path) {
         gridPane.getChildren().clear(); 
         try {
-            // Definir el tamaño uniforme de los botones
-            double buttonWidth = 150;
-            double buttonHeight = 100;
+            
+            double buttonWidth = 100;
+            double buttonHeight = 90;
 
-            // Obtener el directorio de archivos
+           
             java.io.File folder = new java.io.File(path);
-            java.io.File[] files = folder.listFiles(); // Listar todos los archivos y carpetas
+            java.io.File[] files = folder.listFiles(); 
 
             if (files != null) {
                 int column = 0;
                 int row = 0;
 
-                // Iterar sobre todos los archivos y carpetas
+                
                 for (java.io.File file : files) {
 
-                    // Crear un botón para cada archivo o carpeta
+                    
                     Button fileButton = new Button(file.getName());
 
-                    // Establecer el ícono dependiendo si es un archivo o carpeta
                     ImageView icon;
                     if (file.isDirectory()) {
-                        icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/icon_file.png")));
+                        icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/foldericonr.png")));
                     } else {
-                        icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/addfile.png")));
+                        icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/bluefile.png")));
                     }
 
-                    // Configurar el tamaño del ícono
+                
                     icon.setFitWidth(32);
                     icon.setFitHeight(32);
                     fileButton.setGraphic(icon);
-
-                    // Establecer el mismo tamaño para todos los botones
-                    fileButton.setPrefWidth(buttonWidth);   // Ancho del botón
-                    fileButton.setPrefHeight(buttonHeight); // Alto del botón
-
-                    // Crear el ContextMenu
+                    fileButton.setPrefWidth(buttonWidth); 
+                    fileButton.setPrefHeight(buttonHeight); 
+                    fileButton.setStyle("-fx-background-color: #536493; -fx-text-fill: white;");
                     ContextMenu contextMenu = new ContextMenu();
-
-                    // Añadir elementos al menú contextual
-                    
                     MenuItem renombrarItem = new MenuItem("Renombrar");
                     MenuItem eliminarItem = new MenuItem("Eliminar");
+                    MenuItem copiarItem = new MenuItem("Copiar");
 
-                    
+                    copiarItem.setOnAction(event->{
+                        if (file.isDirectory()) {
+                            copyFile(file.getAbsolutePath(), "D:/Dataset");
+                        }
+                        else{
+                            copyFile(file.getAbsolutePath(), "D:/Dataset");
+                        }
 
+                    });
                     renombrarItem.setOnAction(event -> {
                         if (file.isDirectory()) {
                             openRenameFolderModal(file.getAbsolutePath());
                         }else{
                             openRenameFileModal(file.getAbsolutePath());
                         }
-                        // Lógica para renombrar el archivo o carpeta
                     });
 
                     eliminarItem.setOnAction(event -> {
@@ -339,16 +370,15 @@ public class MainController {
                         }
                     });
 
-                    // Añadir los items al ContextMenu
-                    contextMenu.getItems().addAll( renombrarItem, eliminarItem);
+                    // acá se añaden los archivos/carpetas al grid.
+                    contextMenu.getItems().addAll( renombrarItem, eliminarItem,copiarItem);
 
-                    // Asociar el menú contextual al botón
                     fileButton.setOnContextMenuRequested(event -> {
                         
                         contextMenu.show(fileButton, event.getScreenX(), event.getScreenY());
                     });
 
-                    // Evento para abrir una carpeta con el botón izquierdo
+                    // abrir una carpeta con el botón izquierdo
                     if (file.isDirectory()) {
                         fileButton.setOnAction(event -> {
                             pilaRutas.push(folderPath);
@@ -358,13 +388,10 @@ public class MainController {
                             loadFilesAndFolders(folderPath);
                         });
                     }
-
-                    // Añadir el botón al GridPane
                     gridPane.add(fileButton, column, row);
 
-                    // Controlar las columnas y filas
                     column++;
-                    if (column == 6) { // Máximo 6 columnas por fila
+                    if (column == 6) { 
                         column = 0;
                         row++;
                     }
@@ -378,9 +405,6 @@ public class MainController {
 
 
 
-
-
-    // metodo para inicializar carpeta local usuario
     
     @FXML  
     private void startLocalFolder(){
@@ -403,7 +427,7 @@ public class MainController {
     
   
    public String getLocalFolder(){
-       //Verifica si ya existe la carpeta local
+
        String disk= "D:\\"; 
        File folder = new File(disk+"LocalFiles");
 
@@ -411,7 +435,7 @@ public class MainController {
         if (folder.exists() && folder.isDirectory()) {
             return disk+"LocalFiles";
         } else {
-            // en caso de que no exista la crea
+            
             try {
                 Path localPath = Paths.get(disk+"LocalFiles");
                 Files.createDirectory(localPath);
@@ -420,24 +444,21 @@ public class MainController {
             } catch (Exception e) {
                 e.printStackTrace();
                 return "error";
-            }
-            
+            }    
         }
-        
     }
     
     public String getUserHomeFolder(String path,String username){
         File folder = new File(path+"\\"+username);
-        // Verificar si la carpeta ya existe en el equipo
+
         if (folder.exists() && folder.isDirectory()) {
             return path+"\\"+username;
         }else{
-            // en caso de que no, crearla y devolver el path
+            
             try {
                 // Ruta relativa para crear la carpeta
                 Path localPath = Paths.get(path+"\\"+username);
 
-                // Crear la carpeta
                 Files.createDirectory(localPath);
 
 
@@ -448,12 +469,7 @@ public class MainController {
             }
         }
     }
-    
-    
-    // Todas estas rutas se moveran a la vista del gestor de archivos
-    
-    
-    // operaciones archivos (no confundir con carpetas)
+
     public void uploadFile(String path, File file) {
         // Convertir la ruta de destino en un objeto Path
         Path destinationPath = Paths.get(path);
@@ -466,18 +482,17 @@ public class MainController {
             }
         
 
-            // Verificar si la ruta de destino es un directorio y existe
+            //acá si no existe la ruta la crea.
             if (!Files.isDirectory(destinationPath)) {
                 System.out.println("La ruta de destino no es un directorio o no existe: " + path);
                 return;
             }
 
-            // Intentar copiar el archivo al destino
             try {
                 Path sourcePath = file.toPath(); // Convertir File a Path
                 Path targetPath = destinationPath.resolve(file.getName()); // Añadir el nombre del archivo al destino
 
-                // Copiar el archivo a la ruta de destino
+                //para copiar
                 Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 
                 System.out.println("Archivo subido correctamente a: " + targetPath);
@@ -512,21 +527,51 @@ public class MainController {
         }
     }
     
+
     public void copyFile(String origin, String destination) {
         try {
-            // Convertir las rutas de origen y destino a objetos Path
             Path sourcePath = Paths.get(origin);
             Path destinationPath = Paths.get(destination);
-
-            // Copiar el archivo de origen a destino, reemplazar si ya existe
-            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-
+    
+            if (Files.isDirectory(sourcePath)) {
+                // If the source is a directory, copy its contents recursively
+                copyDirectory(sourcePath, destinationPath);
+            } else {
+                // If the source is a file, copy the file to the destination
+                Files.copy(sourcePath, destinationPath.resolve(sourcePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+    
             System.out.println("Archivo copiado de " + sourcePath.toString() + " a " + destinationPath.toString());
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Error al copiar el archivo.");
+            System.out.println("Error al copiar el archivo: " + e);
         }
     }
+
+
+    private void copyDirectory(Path source, Path destination) throws IOException {
+        if (!Files.exists(destination)) {
+            Files.createDirectories(destination);
+        }
+
+        try (var stream = Files.walk(source)) {
+            stream.forEach(sourcePath -> {
+                Path targetPath = destination.resolve(source.relativize(sourcePath));
+                try {
+                    if (Files.isDirectory(sourcePath)) {
+                        if (!Files.exists(targetPath)) {
+                            Files.createDirectory(targetPath);
+                        }
+                    } else {
+                        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
     
     @FXML 
     public void testCopy(){
@@ -701,9 +746,8 @@ public class MainController {
         Path targetPath = sourcePath.resolveSibling(nombreNuevo);
 
         try {
-            // Verificar si la carpeta de origen existe
+
             if (Files.exists(sourcePath) && Files.isDirectory(sourcePath)) {
-                // Renombrar la carpeta
                 Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("Carpeta renombrada exitosamente a: " + targetPath.toString());
             } else {

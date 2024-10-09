@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/22" fx:controller="alejandro.controller.MainController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/22" fx:controller="alejandro.controller.SharedController">
     <top>
         <VBox spacing="10" style="-fx-background-color: #536493;">
             <padding>
@@ -20,24 +20,9 @@
             </padding>
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="SGD" />
             <HBox spacing="10">
-                <Label fx:id="usernameLabel" text="Usuario:" style="-fx-text-fill: white;" />
+                <Label fx:id="usernameLabel" text="SharedFiles:" style="-fx-text-fill: white;" />
                 <Label fx:id="userLabel" text="root" style="-fx-text-fill: white;" />
                 <Pane HBox.hgrow="ALWAYS" />
-                <Button fx:id="addFileButton">
-              <graphic>
-                <ImageView fitHeight="16" fitWidth="16" />
-              </graphic>
-            </Button>
-            <Button fx:id="addFolderButton">
-              <graphic>
-                <ImageView fitHeight="16" fitWidth="16" />
-              </graphic>
-            </Button>
-            <Button fx:id="openSharedButton">
-              <graphic>
-                <ImageView fitHeight="16" fitWidth="16" />
-              </graphic>
-            </Button>
             </HBox>
             
              
@@ -48,14 +33,14 @@
                   <Font name="System Bold" size="18.0" />
                </font></Label>
                 <Pane HBox.hgrow="ALWAYS" />
-                <Button text="Volver" onAction="#volver" fx:id="volverButton" />
+                <Button text="Volver" fx:id="backButton"/>
             </HBox>
         </VBox>
     </top>
 
     <center>
-    <GridPane fx:id="gridPane" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" style="-fx-padding: 10 0 0 0;">
-        <!-- Aquí se añadirán los botones desde el controlador -->
+    <GridPane fx:id="gridShared" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" style="-fx-padding: 10 0 0 0;">
+        
     </GridPane>
 </center>
 

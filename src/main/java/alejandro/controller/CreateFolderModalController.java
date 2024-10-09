@@ -1,12 +1,18 @@
 package alejandro.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class CreateFolderModalController {
      @FXML
     private TextField folderNameField;
+    
+    @FXML
+    private Button createButton;
+    @FXML
+    private Button cancelButton;
 
     private String folderName;
     private boolean confirmed = false;
@@ -22,6 +28,14 @@ public class CreateFolderModalController {
             System.out.println("El nombre de la carpeta no puede estar vacío.");
         }
     }
+
+
+    public void initialize() {
+        createButton.setStyle("-fx-background-color: #536493; -fx-text-fill: white;");
+        cancelButton.setStyle("-fx-background-color: #EF5A6F ; -fx-text-fill: white;");
+    }
+
+
 
     @FXML
     private void onCancel() {

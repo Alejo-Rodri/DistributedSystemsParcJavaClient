@@ -18,8 +18,8 @@
 
     <!-- Contenedor HBox para los botones -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Cancelar" onAction="#onCancel"/>
-        <Button text="Crear" onAction="#onCreateFolder"/>
+        <Button text="Cancelar" onAction="#onCancel" fx:id="cancelButton"/>
+        <Button text="Agregar" onAction="#onCreateFolder" fx:id="createButton"/>
     </HBox>
     
 </VBox>
