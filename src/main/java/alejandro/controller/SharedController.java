@@ -6,6 +6,9 @@ import alejandro.services.FileServiceF.FileService;
 import alejandro.services.UserServiceF.UserService;
 import alejandro.utils.Environment;
 import alejandro.utils.Logs;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -29,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.google.gson.Gson;
+import com.grpc.Syncronization;
 
 public class SharedController {
 
@@ -51,6 +55,11 @@ public class SharedController {
     private UserService userService = new UserService();
     
     private FileService fileService = new FileService();
+
+     String target = "10.153.91.133:50052";
+     ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
+
+    private Syncronization sync = new Syncronization(channel);
     
     private User user = new User();
     
@@ -80,7 +89,6 @@ public class SharedController {
             e.printStackTrace();
         }
     }
-    
     
     private void initializeGridPane() {
         gridShared.getColumnConstraints().clear();
@@ -112,24 +120,19 @@ public class SharedController {
         double buttonWidth = 100;
         double buttonHeight = 90;
     
-
         int column = 0;
         int row = 0;
     
-
         for (FileU file : sharedFiles) {
           
             Button fileButton = new Button(file.getName());
     
             ImageView icon;
             if (file.getMimeType().contains("image")) {
-                
                 icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/icon_file.png")));
             } else if (file.getMimeType().contains("folder")) {
-                
                 icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/foldericonr.png")));
             } else {
-                
                 icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/bluefile.png")));
             }
             icon.setFitWidth(32);
@@ -138,22 +141,33 @@ public class SharedController {
             fileButton.setPrefWidth(buttonWidth);
             fileButton.setPrefHeight(buttonHeight);
             fileButton.setStyle("-fx-background-color: #536493; -fx-text-fill: white;");
-
-
+    
+            // Crear el menú contextual
             ContextMenu contextMenu = new ContextMenu();
+    
+            // Crear la opción de descargar
+            MenuItem downloadItem = new MenuItem("Descargar");
+            downloadItem.setOnAction(event -> downloadSharedFile(file));  // Llama a la función de descarga
+    
+            // Añadir el ítem al menú contextual
+            contextMenu.getItems().add(downloadItem);
+    
+            // Mostrar el menú contextual al hacer clic derecho
             fileButton.setOnContextMenuRequested(event -> {
                 contextMenu.show(fileButton, event.getScreenX(), event.getScreenY());
             });
     
+            // Añadir el botón al grid
             gridShared.add(fileButton, column, row);
             column++;
-
+    
             if (column == 5) { 
                 column = 0;
                 row++;
             }
         }
     }
+    
     
     public void fetchAndLoadSharedFiles() {
         try {
@@ -165,5 +179,17 @@ public class SharedController {
         }
     }
 
-
+    public void downloadSharedFile(FileU file) {
+        try {
+            String fingerprint = file.getId(); 
+            String fileName = file.getName();   
+            String fullFilePath = "D:\\LocalFiles\\" + fileName;  
+            sync.download(fullFilePath, fingerprint);
+            System.out.println("Descarga completada: " + fileName);
+        } catch (Exception e) {
+            System.out.println("Error al descargar el archivo: " + file.getName());
+            e.printStackTrace();
+        }
+    }
+    
 }

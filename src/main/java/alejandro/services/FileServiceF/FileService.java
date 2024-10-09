@@ -10,10 +10,14 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
+import com.grpc.Syncronization;
 
 import alejandro.model.CookieManager;
 import alejandro.model.FileU;
 import alejandro.model.User;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
@@ -25,6 +29,9 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 public class FileService implements IFileService {
+    
+    //private static final String SERVER_ADDRESS = "localhost";
+    //private static final int SERVER_PORT = 8080;
     
     public List<FileU> getSharedFiles() throws IOException {
         String apiUrl = "http://conquest3.bucaramanga.upb.edu.co:5000/files/shared";        
@@ -70,5 +77,23 @@ public class FileService implements IFileService {
                     }
                 }
             return null;
+    }
+
+
+
+
+    public void syncFiles() {
+        
+        String target = "10.153.91.133:50052";
+        try {
+
+            ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
+            System.out.println("Sync Client");
+            Syncronization client = new Syncronization(channel);
+            client.sync();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

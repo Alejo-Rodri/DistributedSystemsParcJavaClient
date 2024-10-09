@@ -61,8 +61,8 @@ public class Syncronization {
         asyncStub = SyncServiceGrpc.newStub(channel);
         util = new SyncUtil();
         dirPath = "D:\\LocalFiles";
-        systemSep = "/";
-        username = "franciscaeu";
+        systemSep = "\\";
+        username = "paula";
     }
 
     public void ping() {
@@ -71,6 +71,7 @@ public class Syncronization {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+        /* 
         try (FileReader reader = new FileReader("demo/src/main/java/com/grpc/log.json")) {
             DeletedFilesResponse fileInfo = gson.fromJson(reader, DeletedFilesResponse.class);
             // System.out.println(fileInfo);
@@ -89,6 +90,7 @@ public class Syncronization {
         } catch (Exception e) {
             System.out.println(e);
         }
+            */
     }
 
     public void sync() {

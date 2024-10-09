@@ -7,4 +7,5 @@ import alejandro.model.FileU;
 
 public interface IFileService {
      public List<FileU> getSharedFiles() throws IOException;
+     public void syncFiles();
 }

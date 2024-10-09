@@ -40,7 +40,12 @@ import javax.swing.JFileChooser;
 
 import alejandro.model.FileU;
 import alejandro.services.FileServiceF.FileService;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
+
 import com.grpc.Sincronizacion;
+import com.grpc.Syncronization;
 
 public class MainController {
 
@@ -126,8 +131,7 @@ public class MainController {
         //evento boton sincronizar
         syncButton.setOnAction(event -> syncFiles());
     }
-     
-   
+        
     private void openSharedFolder()
     {
         try {
@@ -150,18 +154,18 @@ public class MainController {
    //metodo para sincronizar
     private void syncFiles()
     {
-        Sincronizacion sync =new Sincronizacion();
-        sync.sincronizar();
-        
-        
+        Sincronizacion sincro = new Sincronizacion();
+        String resultping  = sincro.ping();
+        System.out.println("ping:" + resultping);
+        try {
+            sincro.sincronizar();
+            folderPath = "D://LocalFiles";
+            loadFilesAndFolders(folderPath);    
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         // esto es pa recargar la pagina apenas sincronice lo comente pq se queda pegado antes de que carge la vista, pero creo que es normal XD
-        
-        folderPath = "D://LocalFiles"; 
-        loadFilesAndFolders(folderPath);
-        
     }   
-
-    
 
     private void openFileChooser() {
         FileChooser fileChooser = new FileChooser();
@@ -178,8 +182,7 @@ public class MainController {
         loadFilesAndFolders(folderPath);
     }
     
-
-  private void openCreateFolderModal() {
+    private void openCreateFolderModal() {
         try {
             // Cargar el modal desde el archivo FXML
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/ModalFolder.fxml")));
@@ -292,7 +295,6 @@ public class MainController {
         }
     }
     
-
     private void initializeGridPane() {
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
@@ -318,8 +320,6 @@ public class MainController {
         gridPane.setVgap(20); 
     }
     
-
-
     private void loadFilesAndFolders(String path) {
         gridPane.getChildren().clear(); 
         try {
@@ -554,10 +554,10 @@ public class MainController {
             Path destinationPath = Paths.get(destination);
     
             if (Files.isDirectory(sourcePath)) {
-                // If the source is a directory, copy its contents recursively
+                
                 copyDirectory(sourcePath, destinationPath);
             } else {
-                // If the source is a file, copy the file to the destination
+                
                 Files.copy(sourcePath, destinationPath.resolve(sourcePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
             }
     
@@ -600,12 +600,8 @@ public class MainController {
     
     public void deleteFile(String path) {
         try {
-            // Convertir la ruta a un objeto Path
             Path filePath = Paths.get(path);
-
-            // Verificar si el archivo existe
             if (Files.exists(filePath)) {
-                // Borrar el archivo
                 Files.delete(filePath);
                 System.out.println("Archivo borrado: " + filePath.toString());
             } else {
