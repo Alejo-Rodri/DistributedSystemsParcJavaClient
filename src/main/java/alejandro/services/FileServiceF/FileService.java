@@ -95,6 +95,53 @@ public class FileService implements IFileService {
         }
 
     }
+    public List<FileU> getFilesInFolder(String resourceFingerprint) throws IOException {
+    String apiUrl = String.format("http://conquest3.bucaramanga.upb.edu.co:5000/files/folder?hash=%s", resourceFingerprint);
+    
+    try (CloseableHttpClient httpClient = HttpClients.custom()
+            .setDefaultCookieStore(CookieManager.getCookieStore())
+            .build()) {
+        HttpGet httpGet = new HttpGet(apiUrl);
+        httpGet.addHeader("Content-Type", "application/json");
+        httpGet.addHeader("resource-hash", resourceFingerprint); // Añadir el encabezado resource-hash
+
+        try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+            int statusCode = response.getCode();
+            if (statusCode == 200) {
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    String responseString = EntityUtils.toString(entity);
+                    System.out.println("respuesta: " + responseString);
+                    try {
+                        JsonObject jsonObject = new Gson().fromJson(responseString, JsonObject.class);
+                        if (jsonObject.has("data")) {
+                            JsonObject data = jsonObject.getAsJsonObject("data");
+                            if (data.has("files")) {
+                                JsonArray filesArray = data.getAsJsonArray("files");
+                                List<FileU> files = new ArrayList<>();
+                                for (int i = 0; i < filesArray.size(); i++) {
+                                    FileU file = new Gson().fromJson(filesArray.get(i), FileU.class);
+                                    files.add(file);
+                                }
+                                return files;
+                            }
+                        }
+                    } catch (JsonSyntaxException e) {
+                        System.err.println("Error de sintaxis JSON: " + e.getMessage());
+                    }
+                } else {
+                    System.out.println("La respuesta no contiene entidad.");
+                }
+            } else {
+                System.out.println("Error en la solicitud. Código de estado: " + statusCode);
+            }
+        } catch (IOException | ParseException e) {
+            System.err.println("Error al procesar la respuesta: " + e.getMessage());
+        }
+    }
+    return null;
+}
+
     public boolean deleteSharedFile(String folderHash, String fileHash) throws IOException, ParseException {
     String apiUrl = "http://conquest3.bucaramanga.upb.edu.co:5000/files/delete";
 

@@ -273,6 +273,7 @@ private void loadSharedFiles(List<FileU> sharedFiles) {
     public void deleteSharedFile(FileU file) {
     try {
         String folderFingerprint = "" ; 
+        // si se esta detro de una carpeta se pasa el folderhash de esa carpeta
         if(!pilaFingerprints.isEmpty()){
           folderFingerprint = pilaFingerprints.peek() ; 
         }
