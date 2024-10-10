@@ -1,5 +1,7 @@
 package alejandro.services.UserServiceF;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.HttpCookie;
 import java.net.URL;
@@ -21,20 +23,20 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.Header;
 
 public class UserService implements IUserService {
+    private static final String TOKEN_PATH = "nosoyeltoken.txt";
+
     public String login(String username, String password) throws IOException {
         String apiUrl = "http://conquest3.bucaramanga.upb.edu.co:5000/auth/login";
         String token = null;
-
-        // Usar el CookieStore compartido
         try (CloseableHttpClient httpClient = HttpClients.custom()
-                .setDefaultCookieStore(CookieManager.getCookieStore()) // Usa el CookieStore compartido
+                .setDefaultCookieStore(CookieManager.getCookieStore())
                 .build()) {
 
             HttpPost httpPost = new HttpPost(apiUrl);
             httpPost.addHeader("Content-Type", "application/json");
             httpPost.addHeader("Accept", "application/json");
 
-            // Crear el cuerpo de la solicitud
+            
             String jsonInputString = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
             httpPost.setEntity(new StringEntity(jsonInputString, StandardCharsets.UTF_8));
 
@@ -42,6 +44,7 @@ public class UserService implements IUserService {
                 int statusCode = response.getCode();
 
                 if (statusCode == 200) {
+                    CookieManager.saveCookies();
                     Header[] headers = response.getHeaders("Set-Cookie");
                     for (Header header : headers) {
                         String cookieHeader = header.getValue();
@@ -54,14 +57,27 @@ public class UserService implements IUserService {
                         }
                     }
 
-                    EntityUtils.consume(response.getEntity()); // Consumir la entidad
+                    EntityUtils.consume(response.getEntity()); 
                     System.out.println("Login exitoso. Token: " + token);
-                    return token; // Retorna el token
+                    return token;
                 } else {
                     System.out.println("Error en la solicitud. Código de estado: " + statusCode);
                 }
             }
         }
         return null;
+    }
+
+    public String getToken() {
+        StringBuilder token = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(TOKEN_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                token.append(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error al leer el token: " + e.getMessage());
+        }
+        return token.toString().trim();
     }
 }

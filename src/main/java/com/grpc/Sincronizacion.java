@@ -31,7 +31,6 @@ public class Sincronizacion{
     public String ping()
     {
         String target = "10.153.91.133:50052";
-        //ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create())
         ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
         try {
             Syncronization sync = new Syncronization(channel);

@@ -2,6 +2,7 @@ package alejandro.controller;
 
 import alejandro.model.FileU;
 import alejandro.model.User;
+import alejandro.model.userSingleton;
 import alejandro.services.FileServiceF.FileService;
 import alejandro.services.UserServiceF.UserService;
 import alejandro.utils.Environment;
@@ -16,6 +17,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -80,8 +82,7 @@ public class LoginController {
 
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MainView.fxml"));
                 Parent root = fxmlLoader.load();
-        
-               
+                saveTokenToFile(token);
                 Stage stage = new Stage();
                 stage.setTitle("Main View");
                 stage.setScene(new Scene(root)); 
@@ -94,6 +95,7 @@ public class LoginController {
             }
         }        
         if (token != null && !token.isEmpty()) {
+            userSingleton.setUsername(username);
             System.out.println("Login exitoso. Token: " + token);
         } else {
             System.out.println("Login fallido.");
@@ -117,6 +119,17 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+    private void saveTokenToFile(String token) {
+        try {
+            FileWriter writer = new FileWriter("nosoyeltoken.txt");
+            writer.write(token);
+            writer.close();
+            System.out.println("El token se ha guardado correctamente en token.txt");
+        } catch (IOException e) {
+            System.out.println("Error al guardar el token en el archivo.");
+            e.printStackTrace();
         }
     }
         

@@ -1,6 +1,9 @@
 package alejandro.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +42,7 @@ import javafx.scene.layout.GridPane;
 import javax.swing.JFileChooser;
 
 import alejandro.model.FileU;
+import alejandro.model.userSingleton;
 import alejandro.services.FileServiceF.FileService;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -85,9 +89,11 @@ public class MainController {
     private Label userLabel;
     @FXML
     private Button openSharedButton;
+
     @FXML
     private Button syncButton;
-
+    @FXML
+    private Button logOutButton;
   
     private Stack<String> pilaRutas = new Stack<>();
     private String folderPath = "D://LocalFiles"; 
@@ -96,8 +102,6 @@ public class MainController {
     
 
     public void initialize() throws IOException {
-        
-        
         folderPath= getLocalFolder();
         lblRuta.setText(folderPath);
         loadFilesAndFolders(folderPath);
@@ -112,6 +116,12 @@ public class MainController {
         Image imageFolder = new Image(getClass().getResourceAsStream("/icons/addFolder.png"));
         ImageView imageViewF = new ImageView(imageFolder);
 
+        Image imageSync = new Image(getClass().getResourceAsStream("/icons/syncIcon.png"));
+        ImageView imageViewSync = new ImageView(imageSync);
+
+        Image imageOut = new Image(getClass().getResourceAsStream("/icons/cerrar-sesion.png"));
+        ImageView imageViewOut = new ImageView(imageOut);
+
         imageView.setFitWidth(24);
         imageView.setFitHeight(24);
 
@@ -120,17 +130,56 @@ public class MainController {
 
         sharedicon.setFitWidth(24); 
         sharedicon.setFitHeight(24);
+
+        imageViewSync.setFitWidth(24);
+        imageViewSync.setFitHeight(24);
+
+        imageViewOut.setFitWidth(24);
+        imageViewOut.setFitHeight(24);
         
         addFileButton.setGraphic(imageView);
         openSharedButton.setGraphic(sharedicon);
         addFolderButton.setGraphic(imageViewF);
+        syncButton.setGraphic(imageViewSync);
+        logOutButton.setGraphic(imageViewOut);
+
         addFileButton.setOnAction(event -> openFileChooser());
         addFolderButton.setOnAction(event -> openCreateFolderModal());
         openSharedButton.setOnAction(event -> openSharedFolder());
-        
-        //evento boton sincronizar
         syncButton.setOnAction(event -> syncFiles());
+        logOutButton.setOnAction(event-> LogOut());
+
+        userLabel.setText(userSingleton.getUsername());
+
+
     }
+    private void LogOut() {
+        File tokenVal = new File("nosoyeltoken.txt");
+        File cookieVal = new File("cookies.txt");
+        if (tokenVal.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(tokenVal))) {
+                // Borrar el contenido del archivo
+                FileWriter writer = new FileWriter(tokenVal, false);
+                FileWriter writer2 = new FileWriter(cookieVal, false);
+                writer.write("");
+                writer2.write("");
+
+                writer.close();
+                writer2.close();
+                System.out.println("El contenido del archivo ha sido borrado.");
+    
+            } catch (Exception e) {
+                System.out.println("Error al borrar el contenido del archivo: " + e.getMessage());
+            }
+        } else {
+            System.out.println("El archivo de token no existe.");
+        }
+        Stage stage = (Stage) logOutButton.getScene().getWindow();
+        stage.close();
+    }
+    
+
+    
         
     private void openSharedFolder()
     {
@@ -151,7 +200,7 @@ public class MainController {
         }
     }     
     
-   //metodo para sincronizar
+
     private void syncFiles()
     {
         Sincronizacion sincro = new Sincronizacion();

@@ -15,6 +15,7 @@ import com.grpc.Syncronization;
 import alejandro.model.CookieManager;
 import alejandro.model.FileU;
 import alejandro.model.User;
+import alejandro.services.UserServiceF.UserService;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
@@ -29,14 +30,13 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 public class FileService implements IFileService {
-    
-    //private static final String SERVER_ADDRESS = "localhost";
-    //private static final int SERVER_PORT = 8080;
+      
+    private UserService user = new UserService();
     
     public List<FileU> getSharedFiles() throws IOException {
         String apiUrl = "http://conquest3.bucaramanga.upb.edu.co:5000/files/shared";        
         try (CloseableHttpClient httpClient = HttpClients.custom()
-                .setDefaultCookieStore(CookieManager.getCookieStore())
+                .setDefaultCookieStore(CookieManager.loadCookies())
                 .build()) {
                     HttpGet httpGet = new HttpGet(apiUrl);
                     httpGet.addHeader("Content-Type", "application/json");
@@ -79,12 +79,9 @@ public class FileService implements IFileService {
             return null;
     }
 
-
-
-
     public void syncFiles() {
         
-        String target = "10.153.91.133:50052";
+        String target = "10.154.12.122:50052";
         try {
 
             ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
