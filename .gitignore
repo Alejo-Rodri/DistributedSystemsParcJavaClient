@@ -38,3 +38,7 @@ build/
 .DS_Store
 # Project exclude paths
 /out/
+
+
+cookies.txt
+nosoyeltoken.txt

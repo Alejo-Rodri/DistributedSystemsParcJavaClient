@@ -20,8 +20,6 @@
     <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
     <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-    <Button text="Login"
-            GridPane.columnIndex="1"
-            GridPane.rowIndex="2"
-            onAction="#handleLogin"/>
+   <Button fx:id="loginButton" text="Login" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-background-color: #536493;-fx-text-fill: white;" onAction="#handleLoginButton"/>
+
 </GridPane>

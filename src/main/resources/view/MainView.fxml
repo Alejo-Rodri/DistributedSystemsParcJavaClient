@@ -1,35 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="alejandro.controller.MainController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/22" fx:controller="alejandro.controller.MainController">
     <top>
-        <VBox spacing="10">
-            <Label text="SGD" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <VBox spacing="10" style="-fx-background-color: #536493;">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+           
             <HBox spacing="10">
-                <Label fx:id="usernameLabel" text="Usuario: " />
-                <Label fx:id="folderLabel" text="root" />
-                <Button text="CreateUser" onAction="#onCreateUser" />
+                 <Button fx:id="logOutButton">
+                   <graphic>
+                       <ImageView fitHeight="16" fitWidth="16" />
+                   </graphic>
+                 </Button>
+                <Label fx:id="userLabel" text="root" style="-fx-text-fill: white;" />
                 <Pane HBox.hgrow="ALWAYS" />
-                <TextField fx:id="searchField" promptText="Search..." />
-                <Button text="Search" onAction="#onSearch" />
+                <Button fx:id="addFileButton">
+              <graphic>
+                <ImageView fitHeight="16" fitWidth="16" />
+              </graphic>
+            </Button>
+            <Button fx:id="addFolderButton">
+              <graphic>
+                <ImageView fitHeight="16" fitWidth="16" />
+              </graphic>
+            </Button>
+            <Button fx:id="openSharedButton">
+              <graphic>
+                <ImageView fitHeight="16" fitWidth="16" />
+              </graphic>
+            </Button>
+            
+            <Button fx:id="syncButton">
+              <graphic>
+                <ImageView fitHeight="16" fitWidth="16" />
+              </graphic>
+            </Button>
+            </HBox>
+            
+             
+         <HBox spacing="10">
+                <Label fx:id="lblRuta" text="D://LocalFiles" style="-fx-text-fill: white;">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font></Label>
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button text="Volver" onAction="#volver" fx:id="volverButton" />
             </HBox>
         </VBox>
     </top>
 
     <center>
-        <SplitPane>
-            <TreeView fx:id="folderTreeView" prefWidth="200" />
-            <TableView fx:id="contentTableView">
-                <columns>
-                    <!-- TODO cambiar el id de esto abajo -->
-                    <TableColumn fx:id="nameColumn"/>
-                    <!-- Puedes agregar más columnas si es necesario -->
-                </columns>
-            </TableView>
-        </SplitPane>
-    </center>
-</BorderPane>
+    <GridPane fx:id="gridPane" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" style="-fx-padding: 10 0 0 0;">
+       
+    </GridPane>
+</center>
 
+</BorderPane>
