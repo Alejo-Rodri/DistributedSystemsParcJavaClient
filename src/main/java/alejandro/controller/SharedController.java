@@ -33,6 +33,8 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 import com.grpc.Syncronization;
+import java.util.Stack;
+import javafx.scene.control.Label;
 
 public class SharedController {
 
@@ -50,10 +52,16 @@ public class SharedController {
 
     @FXML
     private Button backButton;
+    @FXML
+    private Label lblRuta;
 
 
     private UserService userService = new UserService();
     
+    // controla la ruta que aparece en el texto
+    private Stack<String> pilaRutas = new Stack<>();
+    // controla los fingerprints
+    private Stack<String> pilaFingerprints = new Stack<>();
     private FileService fileService = new FileService();
 
      String target = "10.153.91.133:50052";
@@ -62,14 +70,44 @@ public class SharedController {
     private Syncronization sync = new Syncronization(channel);
     
     private User user = new User();
+    private String folderPath = "SharedFiles"; 
     
     public void initialize() throws IOException {
+        lblRuta.setText(folderPath);
+        backButton.setVisible(false);
         fileService.getSharedFiles();
         initializeGridPane();
         fetchAndLoadSharedFiles();
-        backButton.setOnAction(event -> openMainView());
+        backButton.setOnAction(event -> retroceder());
     }
 
+    private void retroceder(){
+        // retroceder en la ruta de la vista
+        if(!pilaRutas.isEmpty()){
+            folderPath=pilaRutas.pop();
+            lblRuta.setText(folderPath);
+        // pop + peek
+        // desapila el fingerprint
+        pilaFingerprints.pop();
+        // checkea la anterior carpeta
+        // primero verifica si hay carpeta que checkear, sino significa q no se vuelve al principio
+       // si quedo vacia significa que vuelve al inicio
+        if(pilaFingerprints.isEmpty()){
+            
+            // cargar inicio
+            initializeGridPane();
+            backButton.setVisible(false);
+            fetchAndLoadSharedFiles();
+        }
+        // sino abre la carpeta donde cayo
+        else{
+            
+            // abrir carpeta anterior
+            openFolder(pilaFingerprints.peek());
+        }
+        }
+    }
+    
     private void openMainView() {
         try {
             // Cargar la nueva vista
@@ -115,64 +153,105 @@ public class SharedController {
         gridShared.setVgap(20); 
     }
 
-    private void loadSharedFiles(List<FileU> sharedFiles) {
-        gridShared.getChildren().clear();    
-        double buttonWidth = 100;
-        double buttonHeight = 90;
-    
-        int column = 0;
-        int row = 0;
-    
-        for (FileU file : sharedFiles) {
-          
-            Button fileButton = new Button(file.getName());
-    
-            ImageView icon;
-            if (file.getMimeType().contains("image")) {
-                icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/icon_file.png")));
-            } else if (file.getMimeType().contains("folder")) {
-                icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/foldericonr.png")));
+private void loadSharedFiles(List<FileU> sharedFiles) {
+    gridShared.getChildren().clear();    
+    double buttonWidth = 100;
+    double buttonHeight = 90;
+
+    int column = 0;
+    int row = 0;
+
+    for (FileU file : sharedFiles) {
+        Button fileButton = new Button(file.getName());
+
+        ImageView icon;
+        if (file.getMimeType().contains("image")) {
+            icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/bluefile.png")));
+        } else if (file.getMimeType().contains("dir")) {
+            icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/foldericonr.png")));
+        } else {
+            icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/bluefile.png")));
+        }
+        icon.setFitWidth(32);
+        icon.setFitHeight(32);
+        fileButton.setGraphic(icon);
+        fileButton.setPrefWidth(buttonWidth);
+        fileButton.setPrefHeight(buttonHeight);
+        fileButton.setStyle("-fx-background-color: #536493; -fx-text-fill: white;");
+
+        // Crear el menú contextual
+        ContextMenu contextMenu = new ContextMenu();
+
+        // Crear la opción de abrir
+        MenuItem openItem = new MenuItem("Abrir");
+        openItem.setOnAction(event -> {
+            if (file.getMimeType().contains("dir")) {
+                System.out.println("Carpeta : " + file.getName());
+                openFolder(file.getId());
+                //aca se guarda el fingerprint de la carpeta que se abrio}
+                //pa volver es pop + peek, creo xd 
+                pilaFingerprints.push(file.getId());
+                //aca se guardan la ruta de la carpeta anterior, a la que se va a volver
+                pilaRutas.push(folderPath);
+                folderPath= folderPath+"/"+file.getName();
+                lblRuta.setText(folderPath);
+                
             } else {
-                icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/bluefile.png")));
+                System.out.println("Archivo : " + file.getName());
             }
-            icon.setFitWidth(32);
-            icon.setFitHeight(32);
-            fileButton.setGraphic(icon);
-            fileButton.setPrefWidth(buttonWidth);
-            fileButton.setPrefHeight(buttonHeight);
-            fileButton.setStyle("-fx-background-color: #536493; -fx-text-fill: white;");
-    
-            // Crear el menú contextual
-            ContextMenu contextMenu = new ContextMenu();
-    
-            // Crear la opción de descargar
-            MenuItem downloadItem = new MenuItem("Descargar");
-            downloadItem.setOnAction(event -> downloadSharedFile(file));  // Llama a la función de descarga
-    
-            // Añadir el ítem al menú contextual
-            contextMenu.getItems().add(downloadItem);
-    
-            // Mostrar el menú contextual al hacer clic derecho
-            fileButton.setOnContextMenuRequested(event -> {
-                contextMenu.show(fileButton, event.getScreenX(), event.getScreenY());
-            });
-    
-            // Añadir el botón al grid
-            gridShared.add(fileButton, column, row);
-            column++;
-    
-            if (column == 5) { 
-                column = 0;
-                row++;
-            }
+            // Aquí puedes agregar más lógica para abrir el archivo o la carpeta si es necesario.
+        });
+
+        // Crear la opción de descargar
+        MenuItem downloadItem = new MenuItem("Descargar");
+        downloadItem.setOnAction(event -> downloadSharedFile(file));  // Llama a la función de descarga
+
+        // Crear la opción de eliminar
+        MenuItem deleteItem = new MenuItem("Eliminar");
+        deleteItem.setOnAction(event -> deleteSharedFile(file));
+
+        // Añadir los ítems al menú contextual
+        contextMenu.getItems().addAll(openItem, downloadItem, deleteItem);
+
+        // Mostrar el menú contextual al hacer clic derecho
+        fileButton.setOnContextMenuRequested(event -> {
+            contextMenu.show(fileButton, event.getScreenX(), event.getScreenY());
+        });
+
+        // Añadir el botón al grid
+        gridShared.add(fileButton, column, row);
+        column++;
+
+        if (column == 5) { 
+            column = 0;
+            row++;
         }
     }
+}
+
+
+
+
     
     
     public void fetchAndLoadSharedFiles() {
         try {
             List<FileU> sharedFiles = fileService.getSharedFiles();
             loadSharedFiles(sharedFiles);
+        } catch (Exception e) {
+            System.out.println("Error al obtener archivos compartidos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public void openFolder(String fingerPrint){
+        
+        try {
+            initializeGridPane();
+            backButton.setVisible(true);
+            List<FileU> sharedFiles = fileService.getFilesInFolder(fingerPrint);
+            loadSharedFiles(sharedFiles);
+            
         } catch (Exception e) {
             System.out.println("Error al obtener archivos compartidos: " + e.getMessage());
             e.printStackTrace();
@@ -191,5 +270,39 @@ public class SharedController {
             e.printStackTrace();
         }
     }
-    
+    public void deleteSharedFile(FileU file) {
+    try {
+        String folderFingerprint = "" ; 
+        if(!pilaFingerprints.isEmpty()){
+          folderFingerprint = pilaFingerprints.peek() ; 
+        }
+        
+        
+        
+        String fileFingerprint = file.getId(); // Hash del archivo a eliminar
+        
+        // Llamada al servicio para eliminar el archivo
+        boolean deleted = fileService.deleteSharedFile(folderFingerprint,fileFingerprint);
+        
+        if (deleted) {
+            System.out.println("Archivo eliminado: " + file.getName());
+            fileService.getSharedFiles();
+            // Se recarga la vista inicial
+            if(folderFingerprint.equals("")){
+                initializeGridPane();
+                fetchAndLoadSharedFiles();
+            }else{
+                //se recarga la vista en la que se esta
+                openFolder(folderFingerprint);
+            }
+            
+        } else {
+            System.out.println("No se pudo eliminar el archivo: " + file.getName());
+        }
+    } catch (Exception e) {
+        System.out.println("Error al eliminar el archivo: " + file.getName());
+        e.printStackTrace();
+    }
+}
+
 }
