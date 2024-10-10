@@ -58,7 +58,6 @@ public class SharedController {
 
     private UserService userService = new UserService();
     
-    // controla la ruta que aparece en el texto
     private Stack<String> pilaRutas = new Stack<>();
     // controla los fingerprints
     private Stack<String> pilaFingerprints = new Stack<>();
@@ -86,15 +85,8 @@ public class SharedController {
         if(!pilaRutas.isEmpty()){
             folderPath=pilaRutas.pop();
             lblRuta.setText(folderPath);
-        // pop + peek
-        // desapila el fingerprint
         pilaFingerprints.pop();
-        // checkea la anterior carpeta
-        // primero verifica si hay carpeta que checkear, sino significa q no se vuelve al principio
-       // si quedo vacia significa que vuelve al inicio
         if(pilaFingerprints.isEmpty()){
-            
-            // cargar inicio
             initializeGridPane();
             backButton.setVisible(false);
             fetchAndLoadSharedFiles();
@@ -110,7 +102,6 @@ public class SharedController {
     
     private void openMainView() {
         try {
-            // Cargar la nueva vista
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MainView.fxml"));
             Parent root = fxmlLoader.load();
             Stage stage = new Stage();
@@ -118,9 +109,7 @@ public class SharedController {
             stage.setMinWidth(500);
             stage.setMinHeight(300);
             stage.setScene(new Scene(root)); 
-            stage.show();     
-    
-            // Cerrar la ventana actual
+            stage.show();
             Stage currentStage = (Stage) root.getScene().getWindow(); // Obtener el stage actual
             currentStage.close();
         } catch (IOException e) {
@@ -270,30 +259,28 @@ private void loadSharedFiles(List<FileU> sharedFiles) {
             e.printStackTrace();
         }
     }
+
     public void deleteSharedFile(FileU file) {
     try {
-        String folderFingerprint = "" ; 
-        // si se esta detro de una carpeta se pasa el folderhash de esa carpeta
+        String folderFingerprint = "" ;
         if(!pilaFingerprints.isEmpty()){
           folderFingerprint = pilaFingerprints.peek() ; 
         }
         
         
         
-        String fileFingerprint = file.getId(); // Hash del archivo a eliminar
-        
-        // Llamada al servicio para eliminar el archivo
+        String fileFingerprint = file.getId();
+
         boolean deleted = fileService.deleteSharedFile(folderFingerprint,fileFingerprint);
         
         if (deleted) {
             System.out.println("Archivo eliminado: " + file.getName());
             fileService.getSharedFiles();
-            // Se recarga la vista inicial
+
             if(folderFingerprint.equals("")){
                 initializeGridPane();
                 fetchAndLoadSharedFiles();
             }else{
-                //se recarga la vista en la que se esta
                 openFolder(folderFingerprint);
             }
             

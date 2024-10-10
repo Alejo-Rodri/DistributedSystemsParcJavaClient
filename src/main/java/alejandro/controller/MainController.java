@@ -99,10 +99,13 @@ public class MainController {
     private String folderPath = "D://LocalFiles"; 
     private FileService fileService = new FileService();
     private FileU file  = new FileU();
+
+    Sincronizacion sincro = new Sincronizacion();
     
 
     public void initialize() throws IOException {
         folderPath= getLocalFolder();
+        sincro.scheduleDailySync();
         lblRuta.setText(folderPath);
         loadFilesAndFolders(folderPath);
         volverButton.setVisible(false);
@@ -203,7 +206,7 @@ public class MainController {
 
     private void syncFiles()
     {
-        Sincronizacion sincro = new Sincronizacion();
+        
         String resultping  = sincro.ping();
         System.out.println("ping:" + resultping);
         try {
@@ -233,30 +236,24 @@ public class MainController {
     
     private void openCreateFolderModal() {
         try {
-            // Cargar el modal desde el archivo FXML
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/ModalFolder.fxml")));
             
 
             Parent parent = loader.load();
 
-            // Crear una nueva ventana (Stage) para el modal
+           
             Stage stage = new Stage();
 
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Agregar Carpeta");
 
 
-            stage.setMinWidth(400); // Ancho mínimo en píxeles
+            stage.setMinWidth(400); 
             stage.setMinHeight(200);
             stage.setScene(new Scene(parent));
-
-            // Obtener el controlador del modal
             CreateFolderModalController controller = loader.getController();
-
-            // Mostrar el modal y esperar hasta que el usuario lo cierre
             stage.showAndWait();
-            
-            // Procesar el nombre de la carpeta cuando el usuario confirme
+
             if (controller.isConfirmed()) {
                 String folderName = controller.getFolderName();
                 createFolder(folderPath,folderName);
@@ -270,30 +267,26 @@ public class MainController {
   
     private void openRenameFolderModal(String path) {
         try {
-            // Cargar el modal desde el archivo FXML
+           
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/ModalRenameFolder.fxml")));
             
 
             Parent parent = loader.load();
-
-            // Crear una nueva ventana (Stage) para el modal
             Stage stage = new Stage();
 
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Renombrar carpeta");
 
 
-            stage.setMinWidth(400); // Ancho mínimo en píxeles
+            stage.setMinWidth(400);
             stage.setMinHeight(200);
             stage.setScene(new Scene(parent));
 
-            // Obtener el controlador del modal
+            
             RenameFolderModalController controller = loader.getController();
-
-            // Mostrar el modal y esperar hasta que el usuario lo cierre
             stage.showAndWait();
             
-            // Procesar el nombre de la carpeta cuando el usuario confirme
+            // procesar el nombre de la carpeta cuando el usuario confirme
             if (controller.isConfirmed()) {
                 String folderName = controller.getFolderName();
                 renameFolder(path, folderName);

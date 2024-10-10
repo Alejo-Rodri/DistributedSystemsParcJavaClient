@@ -146,7 +146,7 @@ public class FileService implements IFileService {
     String apiUrl = "http://conquest3.bucaramanga.upb.edu.co:5000/files/delete";
 
     try (CloseableHttpClient httpClient = HttpClients.custom()
-            .setDefaultCookieStore(CookieManager.getCookieStore())
+            .setDefaultCookieStore(CookieManager.loadCookies())
             .build()) {
 
         HttpDelete httpDelete = new HttpDelete(apiUrl);

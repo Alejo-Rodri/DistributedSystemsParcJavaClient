@@ -38,7 +38,7 @@ import java.util.Map;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -94,26 +94,35 @@ public class Syncronization {
             */
     }
 
+    private String leerUsuarioDesdeArchivo(String filePath) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new IOException("Error al leer el archivo: " + e.getMessage(), e);
+        }
+    }
+
     public void sync() {
         try {
-            Map<String, FileData> clientTree = new HashMap<>();
-            List<String> elementsToRemove = new ArrayList<>();
+            String user = leerUsuarioDesdeArchivo("nosoyeltoken.txt");
             
-            clientTree = util.getTree(dirPath);
-
+            Map<String, FileData> clientTree = util.getTree(dirPath);
+            List<String> elementsToRemove = new ArrayList<>();
             SyncRequest request = SyncRequest
                 .newBuilder()
-                    .setSep(systemSep)
-                    .setUser(username)
-                    .putAllClientTree(clientTree)
-                    .addAllToRemove(elementsToRemove)
+                .setSep(systemSep)
+                .setUser(user)
+                .putAllClientTree(clientTree)
+                .addAllToRemove(elementsToRemove)
                 .build();
 
             SyncResponse response = blockingStub.sync(request);
 
             DoSync(response.getElementsMap().entrySet());
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo de usuario: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Ha ocurrido un error " + e);
+            System.out.println("Ha ocurrido un error en la sincronización: " + e.getMessage());
         }
     }
 
@@ -140,7 +149,7 @@ public class Syncronization {
 
             if (key.equals("toSendToServer")) {
                 for (FileData element : fileList.getElementsList()) {
-                    upload(dirPath + systemSep + element.getPath(), element.getFolderFingerprint()); // Enviar al servidor
+                    upload(dirPath + systemSep + element.getPath(), element.getFolderFingerprint());
                 }
             }
 
@@ -160,13 +169,13 @@ public class Syncronization {
 
             if (key.equals("toClientUpdate")){
                 for (FileData element : fileList.getElementsList()) {
-                    download(dirPath + systemSep + element.getPath(), element.getFingerprint()); //Descargar del servidor
+                    download(dirPath + systemSep + element.getPath(), element.getFingerprint());
                 }
             }
 
             if (key.equals("toServerUpdate")){
                 for (FileData element : fileList.getElementsList()) {
-                    upload(dirPath + systemSep + element.getPath(), element.getFolderFingerprint()); // Enviar al servidor
+                    upload(dirPath + systemSep + element.getPath(), element.getFolderFingerprint()); 
                 }
             }
         }

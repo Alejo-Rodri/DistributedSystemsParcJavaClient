@@ -124,7 +124,7 @@ public class LoginController {
     private void saveTokenToFile(String token) {
         try {
             FileWriter writer = new FileWriter("nosoyeltoken.txt");
-            writer.write(token);
+            writer.write(usernameField.getText());
             writer.close();
             System.out.println("El token se ha guardado correctamente en token.txt");
         } catch (IOException e) {
