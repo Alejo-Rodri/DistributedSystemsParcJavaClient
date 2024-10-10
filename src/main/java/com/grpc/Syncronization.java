@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.grpc.util.StreamsManager;
 import com.grpc.util.SyncUtil;
 
+import alejandro.model.userSingleton;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 import sync.SyncServiceGrpc;
@@ -56,13 +57,13 @@ public class Syncronization {
     private final String systemSep;
     private final String username;
 
-    public Syncronization(Channel channel) {
+    public Syncronization(Channel channel) { 
         blockingStub = SyncServiceGrpc.newBlockingStub(channel);
         asyncStub = SyncServiceGrpc.newStub(channel);
         util = new SyncUtil();
         dirPath = "D:\\LocalFiles";
         systemSep = "\\";
-        username = "paula";
+        username = userSingleton.getUsername();
     }
 
     public void ping() {
